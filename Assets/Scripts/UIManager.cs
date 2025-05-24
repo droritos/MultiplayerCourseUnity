@@ -19,11 +19,11 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
+
     [Header("Lobby Data")]
     [SerializeField] TMP_InputField lobbyInput;
     [SerializeField] Button enterLobby;
     [SerializeField] GameObject uxMessageToPlayer;
-
 
     [Header("Session Data")]
     [SerializeField] TextMeshProUGUI totalSessions;
@@ -31,9 +31,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] SessionInfoConverter sessionInfoPrefab;
 
     [Header("Transforms")]
-    [SerializeField] RectTransform sesstionParent;
-
-
+    [SerializeField] RectTransform sessionParent;
+    [SerializeField] RectTransform lobbyMenu;
+    [SerializeField] RectTransform sessionMenu;
+    [SerializeField] RectTransform inGameMenu;
     private List<SessionInfoConverter> _sesstionsList;
 
     public void JoinLobby() // Button Method
@@ -44,26 +45,55 @@ public class UIManager : MonoBehaviour
             return;
         }
         else
-            OnEnterLobby?.Invoke(lobbyInput.text);
-    }
-
-    public void ButtonClicked(Button button) // Button Method
-    {
-        button.interactable = false;
-    }
-    public void CreateSessions(List<SessionInfo> sessions)
-    {
-        for (int i = 0; i < sessions.Count; i++)
         {
-            SessionInfoConverter newSesstion = Instantiate(sessionInfoPrefab, sesstionParent);
-            newSesstion.UpdateSession(sessions[i].Name, sessions[i].PlayerCount, sessions[i].MaxPlayers);
-
-            _sesstionsList.Add(newSesstion);
+            OnEnterLobby?.Invoke(lobbyInput.text);
+            enterLobby.interactable = false;
         }
     }
 
+    public void CreateSessions(List<SessionInfo> sessions)
+    {
+        // Clear existing UI
+        foreach (Transform child in sessionParent)
+            Destroy(child.gameObject);
+
+        _sesstionsList = new List<SessionInfoConverter>();
+        for (int i = 0; i < sessions.Count; i++)
+        {
+            SessionInfoConverter newSesstion = Instantiate(sessionInfoPrefab, sessionParent);
+            newSesstion.UpdateSession(sessions[i].Name, sessions[i].PlayerCount, sessions[i].MaxPlayers);
+            _sesstionsList.Add(newSesstion);
+        }
+        Debug.Log($"Created {sessions.Count} Sessions Convertors");
+    }
+
+    public void SetSessionButton(NetworkManager networkManager)
+    {
+        foreach (var SessionInfoConverter in _sesstionsList)
+        {
+            SessionInfoConverter.SetJoinAction(SessionInfoConverter.SessionName, networkManager);
+        }
+    }
+
+
     public void SetTotalSessions(int amount = 0)
     {
-        totalSessions.text = amount.ToString();
+        totalSessions.text = "Total Sesstion: " + amount.ToString();
+    }
+
+    public void HandleConnectionDisplay(bool state)
+    {
+        if (state)
+        {
+            sessionMenu.gameObject.SetActive(false);
+            inGameMenu.gameObject.SetActive(true);
+
+
+
+        }
+        else
+        {
+
+        }
     }
 }

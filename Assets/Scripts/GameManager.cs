@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,18 +11,21 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        netsworkManager.OnSessionUpdated += CreateSessions;
+
         uiManager.OnEnterLobby += netsworkManager.JoinLobby;
         uiManager.OnEnterSession += netsworkManager.StartSession;
 
-        if (netsworkManager.SessionList != null) // Create Session if is there any
-        {
-            uiManager.CreateSessions(netsworkManager.SessionList);
-            uiManager.SetTotalSessions(netsworkManager.SessionList.Count);
-        }
-        else
-        {
-            uiManager.SetTotalSessions(0);
-        }
+
+    }
+
+    private void CreateSessions(List<SessionInfo> sessionInfos)
+    {
+        if (sessionInfos.Count <= 0 || sessionInfos == null) return;
+        uiManager.SetTotalSessions(sessionInfos.Count);
+        uiManager.CreateSessions(sessionInfos);
+
+        uiManager.SetSessionButton(netsworkManager);
     }
 
     private void OnValidate()

@@ -38,6 +38,8 @@ public class Session : MonoBehaviour
         else
         {
             startSesstion.interactable = false;
+            sessionNameInput.interactable = false;
+            maxPlayerAllowed.interactable = false;
             OnEnterSession?.Invoke(sessionName, maxPlayers);
         }
     }

@@ -3,22 +3,25 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    public event UnityAction<List<SessionInfo>> OnSessionUpdated;
+    public UnityEvent OnFinishConnection;
+    public UnityEvent<bool> OnConnection;
+
+
     [SerializeField] NetworkRunner networkRunner;
 
+    private List<SessionInfo> _sessionInfos;
     private bool _hasStarted = false;
-
-    private const string _sessionName = "Funny Server";
-    public List<SessionInfo> SessionList {  get; private set; }
-
     private void OnEnable()
     {
         networkRunner.AddCallbacks(this);
     }
 
-    public async void StartSession(string SesstionName, int MaxPlayerCount)
+    public async void StartSession(string sessionName, int maxPlayerCount)
     {
         if (_hasStarted) return;
         _hasStarted = true;
@@ -26,21 +29,55 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         var result = await networkRunner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Shared,
-            SessionName = SesstionName,
+            SessionName = sessionName,
             CustomLobbyName = networkRunner.LobbyInfo.Name,
-            PlayerCount = MaxPlayerCount,
+            PlayerCount = maxPlayerCount,
             OnGameStarted = OnGameStarted,
 
         });
 
         if (result.Ok)
         {
+            OnFinishConnection?.Invoke();
+
             Debug.Log("Game started successfully.");
         }
         else
         {
             Debug.LogError($"Failed to start game: {result.ShutdownReason}");
         }
+
+        if(_sessionInfos != null)
+            OnSessionUpdated?.Invoke(_sessionInfos);
+    }
+
+    public async void JoinSession(string sessionName)
+    {
+        if (_hasStarted) return;
+        _hasStarted = true;
+
+        var result = await networkRunner.StartGame(new StartGameArgs()
+        {
+            GameMode = GameMode.Shared,
+            SessionName = sessionName,
+            CustomLobbyName = networkRunner.LobbyInfo.Name,
+            OnGameStarted = OnGameStarted,
+
+        });
+
+        if (result.Ok)
+        {
+            OnFinishConnection?.Invoke();
+
+            Debug.Log("Game started successfully.");
+        }
+        else
+        {
+            Debug.LogError($"Failed to start game: {result.ShutdownReason}");
+        }
+
+        if (_sessionInfos != null)
+            OnSessionUpdated?.Invoke(_sessionInfos);
     }
     private void OnGameStarted(NetworkRunner obj)
     {
@@ -53,7 +90,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             await networkRunner.JoinSessionLobby(SessionLobby.Custom, lobbyName);
 
         if (result.Ok)
-            Debug.Log($"Joined Lobby: {lobbyName}");
+        {
+            OnFinishConnection?.Invoke();
+        }
+
+        if (_sessionInfos != null)
+            OnSessionUpdated?.Invoke(_sessionInfos);
+
     }
 
     void OnValidate()
@@ -66,7 +109,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
 
     #region << Network Callbacks >>
-
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
 
@@ -75,28 +117,22 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         if(networkRunner.LocalPlayer == player)
             isLocalPlayer = true;
 
-
         Debug.Log($"{player.PlayerId} Joined, Local Player: {isLocalPlayer}");
 
-        // Apply Update UI
+        OnConnection.Invoke(true);
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        OnConnection.Invoke(true);
         Debug.Log("Player Left");
     }
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
-        SessionList = sessionList;
-
-        Debug.Log($"Session List Updated {sessionList.Count} Sessions");
-
-        foreach (SessionInfo sessionInfo in sessionList)
-        {
-            //_sessionList.Add(sessionInfo);
-            Debug.Log($"Session Name: {sessionInfo.Name}, Player Count: {sessionInfo.PlayerCount}");
-        }
+        _sessionInfos = sessionList;
+        OnSessionUpdated?.Invoke(_sessionInfos);
+        Debug.Log("Session Updated Invoke Event!");
     }
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
     {
@@ -108,10 +144,12 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        throw new NotImplementedException();
+        OnConnection.Invoke(false);
     }
     public void OnConnectedToServer(NetworkRunner runner)
     {
+        OnConnection.Invoke(true);
+        // Apply UI of the Players in the sesstion
         //throw new NotImplementedException();
     }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)

@@ -6,32 +6,49 @@ using WebSocketSharp;
 
 public class Session : MonoBehaviour
 {
-    public event UnityAction OnSessestionStarted;
+    public event UnityAction<string, int> OnEnterSession;
+
 
     [SerializeField] TMP_InputField sessionNameInput;
     [SerializeField] Slider maxPlayerAllowed;
     [SerializeField] TextMeshProUGUI maxPlayerText;
     [SerializeField] Button startSesstion;
 
-    public void StartSesstion(LobbyManager lobbyManager)
+    [SerializeField] GameObject uxMessageToPlayer;
+
+    private void Start()
+    {
+        startSesstion.onClick.AddListener(OnStartSessionButtonClicked);
+    }
+    private void OnStartSessionButtonClicked() // Button Method
+    {
+        string sessionName = sessionNameInput.text;
+        int maxPlayers = (int)maxPlayerAllowed.value;
+
+        StartSesstion(sessionName, maxPlayers);
+    }
+
+    private void StartSesstion(string sessionName,int maxPlayers)
     {
         if (sessionNameInput.text.IsNullOrEmpty())
         {
-            // Apply UX effect that notify players that they must enter a name
+            uxMessageToPlayer.SetActive(true);
             return;
         }
-
-        lobbyManager.StartSession(sessionNameInput.text,(int)maxPlayerAllowed.value);
-        OnSessestionStarted.Invoke();
+        else
+        {
+            startSesstion.interactable = false;
+            OnEnterSession?.Invoke(sessionName, maxPlayers);
+        }
     }
+
     public void SetMaxPlayers()
     {
         maxPlayerText.text = maxPlayerAllowed.value.ToString();
     }
-    public void TryStartSession(TMP_InputField inputText)
+    public void TryStartSession()
     {
-        if (sessionNameInput.text.IsNullOrEmpty())
-            return;
+        uxMessageToPlayer.SetActive(true);
     }
 
 

@@ -1,20 +1,33 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] LobbyManager lobbyManager;
+    [SerializeField] NetworkManager netsworkManager;
     [SerializeField] UIManager uiManager;
+
 
     private void Awake()
     {
-        uiManager.OnEnterLobby += lobbyManager.JoinLobby;
+        uiManager.OnEnterLobby += netsworkManager.JoinLobby;
+        uiManager.OnEnterSession += netsworkManager.StartSession;
+
+        if (netsworkManager.SessionList != null) // Create Session if is there any
+        {
+            uiManager.CreateSessions(netsworkManager.SessionList);
+            uiManager.SetTotalSessions(netsworkManager.SessionList.Count);
+        }
+        else
+        {
+            uiManager.SetTotalSessions(0);
+        }
     }
 
     private void OnValidate()
     {
-        if(!lobbyManager)
-            lobbyManager = FindAnyObjectByType<LobbyManager>();
+        if(!netsworkManager)
+            netsworkManager = FindAnyObjectByType<NetworkManager>();
 
         if(!uiManager)
             uiManager = FindAnyObjectByType<UIManager>();

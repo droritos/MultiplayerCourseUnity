@@ -5,43 +5,65 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using WebSocketSharp;
 using System.Collections.Generic;
+using Fusion;
 
 public class UIManager : MonoBehaviour
 {
+    #region << Events >>
     public event UnityAction<string> OnEnterLobby;
-    public event UnityAction OnEmptyOrNullInput;
-
-    [SerializeField] TMP_InputField lobbyInput;
-    [SerializeField] Button enterLobby;
-
-    [SerializeField] GameObject uxMessageToPlayer;
-
-    [SerializeField] List<Session> sesstionsList;
-
-    public void JoinLobby()
+    public event UnityAction<string, int> OnEnterSession
     {
-        EmptyOrNullInput(lobbyInput.text);
-
-        OnEnterLobby?.Invoke(lobbyInput.text);
+        add { session.OnEnterSession += value; }
+        remove { session.OnEnterSession -= value; }
     }
 
-    public void ButtonClicked(Button button)
+    #endregion
+
+    [Header("Lobby Data")]
+    [SerializeField] TMP_InputField lobbyInput;
+    [SerializeField] Button enterLobby;
+    [SerializeField] GameObject uxMessageToPlayer;
+
+
+    [Header("Session Data")]
+    [SerializeField] TextMeshProUGUI totalSessions;
+    [SerializeField] Session session;
+    [SerializeField] SessionInfoConverter sessionInfoPrefab;
+
+    [Header("Transforms")]
+    [SerializeField] RectTransform sesstionParent;
+
+
+    private List<SessionInfoConverter> _sesstionsList;
+
+    public void JoinLobby() // Button Method
+    {
+        if (lobbyInput.text.IsNullOrEmpty())
+        {
+            uxMessageToPlayer.SetActive(true);
+            return;
+        }
+        else
+            OnEnterLobby?.Invoke(lobbyInput.text);
+    }
+
+    public void ButtonClicked(Button button) // Button Method
     {
         button.interactable = false;
     }
-
-    public void EmptyOrNullInput(string text)
+    public void CreateSessions(List<SessionInfo> sessions)
     {
-        if (text.IsNullOrEmpty())
+        for (int i = 0; i < sessions.Count; i++)
         {
-            uxMessageToPlayer.SetActive(true);
-            OnEmptyOrNullInput.Invoke();
+            SessionInfoConverter newSesstion = Instantiate(sessionInfoPrefab, sesstionParent);
+            newSesstion.UpdateSession(sessions[i].Name, sessions[i].PlayerCount, sessions[i].MaxPlayers);
+
+            _sesstionsList.Add(newSesstion);
         }
     }
 
-    private void HandleEmptyInput()
+    public void SetTotalSessions(int amount = 0)
     {
-
+        totalSessions.text = amount.ToString();
     }
-
 }

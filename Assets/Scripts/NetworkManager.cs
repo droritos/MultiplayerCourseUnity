@@ -4,13 +4,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] NetworkRunner networkRunner;
 
     private bool _hasStarted = false;
 
     private const string _sessionName = "Funny Server";
+    public List<SessionInfo> SessionList {  get; private set; }
 
     private void OnEnable()
     {
@@ -25,9 +26,11 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         var result = await networkRunner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Shared,
-            SessionName = _sessionName,
+            SessionName = SesstionName,
             CustomLobbyName = networkRunner.LobbyInfo.Name,
-            PlayerCount = 20
+            PlayerCount = MaxPlayerCount,
+            OnGameStarted = OnGameStarted,
+
         });
 
         if (result.Ok)
@@ -85,10 +88,13 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
+        SessionList = sessionList;
+
         Debug.Log($"Session List Updated {sessionList.Count} Sessions");
 
         foreach (SessionInfo sessionInfo in sessionList)
         {
+            //_sessionList.Add(sessionInfo);
             Debug.Log($"Session Name: {sessionInfo.Name}, Player Count: {sessionInfo.PlayerCount}");
         }
     }
@@ -106,7 +112,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     }
     public void OnConnectedToServer(NetworkRunner runner)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
@@ -134,7 +140,8 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     }
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        throw new NotImplementedException();
+        // Do Nothing no players yet
+        //throw new NotImplementedException();
     }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
     {

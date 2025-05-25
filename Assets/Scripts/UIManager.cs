@@ -10,7 +10,6 @@ using Fusion;
 public class UIManager : MonoBehaviour
 {
     #region << Events >>
-    public event UnityAction OnJoinedSession;
     public event UnityAction<string> OnEnterLobby;
     public event UnityAction<string, int> OnEnterSession
     {

@@ -2,108 +2,136 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public event UnityAction<List<SessionInfo>> OnSessionUpdated;
-    public UnityEvent OnFinishConnection;
-    public UnityEvent<bool> OnConnection;
+    public event UnityAction<SessionInfo> OnSessionJoined;
+    public UnityEvent<SceneType> OnConnection;
 
-
-    [SerializeField] NetworkRunner networkRunner;
+    [field: SerializeField] public NetworkRunner NetworkRunner {  get; private set; }
 
     private List<SessionInfo> _sessionInfos;
-    private bool _hasStarted = false;
+    //private bool _hasStarted = false;
     private void OnEnable()
     {
-        networkRunner.AddCallbacks(this);
+        NetworkRunner.AddCallbacks(this);
     }
 
     public async void StartSession(string sessionName, int maxPlayerCount)
     {
-        if (_hasStarted) return;
-        _hasStarted = true;
+        //if (_hasStarted) return;
+        //_hasStarted = true;
 
-        var result = await networkRunner.StartGame(new StartGameArgs()
+        var result = await NetworkRunner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = sessionName,
-            CustomLobbyName = networkRunner.LobbyInfo.Name,
+            CustomLobbyName = NetworkRunner.LobbyInfo.Name,
             PlayerCount = maxPlayerCount,
             OnGameStarted = OnGameStarted,
-
         });
 
         if (result.Ok)
         {
-            OnFinishConnection?.Invoke();
-
+            //OnConnection?.Invoke(SceneType.InGameMenuScene);
+            OnSessionJoined?.Invoke(NetworkRunner.SessionInfo);
             Debug.Log("Game started successfully.");
         }
         else
         {
             Debug.LogError($"Failed to start game: {result.ShutdownReason}");
+            if (!NetworkRunner)
+            {
+                NetworkRunner = this.AddComponent<NetworkRunner>();
+                NetworkRunner.AddCallbacks(this);
+            }
+            OnConnection.Invoke(SceneType.LobbyMeneScene); // Return To Lobby
         }
 
-        if(_sessionInfos != null)
+        if (_sessionInfos != null)
             OnSessionUpdated?.Invoke(_sessionInfos);
     }
 
     public async void JoinSession(string sessionName)
     {
-        if (_hasStarted) return;
-        _hasStarted = true;
+        //if (_hasStarted) return;
+        //_hasStarted = true;
 
-        var result = await networkRunner.StartGame(new StartGameArgs()
+        var result = await NetworkRunner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = sessionName,
-            CustomLobbyName = networkRunner.LobbyInfo.Name,
+            CustomLobbyName = NetworkRunner.LobbyInfo.Name,
             OnGameStarted = OnGameStarted,
 
         });
 
         if (result.Ok)
         {
-            OnFinishConnection?.Invoke();
-
+            //OnConnection?.Invoke(SceneType.InGameMenuScene);
+            OnSessionJoined?.Invoke(NetworkRunner.SessionInfo);
             Debug.Log("Game started successfully.");
         }
         else
         {
             Debug.LogError($"Failed to start game: {result.ShutdownReason}");
+            if (!NetworkRunner) // Handle NetworkRunner destroyed
+            {
+                NetworkRunner = this.AddComponent<NetworkRunner>();
+                NetworkRunner.AddCallbacks(this);
+            }
+            OnConnection.Invoke(SceneType.LobbyMeneScene); // Return To Lobby
         }
 
         if (_sessionInfos != null)
             OnSessionUpdated?.Invoke(_sessionInfos);
+    }
+
+    public async void JoinLobby(string lobbyName)
+    {
+        StartGameResult result =
+            await NetworkRunner.JoinSessionLobby(SessionLobby.Custom, lobbyName);
+
+        if (result.Ok)
+        {
+            OnConnection?.Invoke(SceneType.SessionMenuScene);
+        }
+
+        if (_sessionInfos != null)
+            OnSessionUpdated?.Invoke(_sessionInfos);
+
+    }
+
+    public async void LeaveSession()
+    {
+        Debug.Log("Leaving session...");
+
+        if (NetworkRunner != null)
+        {
+            await NetworkRunner.Shutdown();
+        }
     }
     private void OnGameStarted(NetworkRunner obj)
     {
         Debug.Log("Game Started");
     }
 
-    public async void JoinLobby(string lobbyName)
-    {
-        StartGameResult result =
-            await networkRunner.JoinSessionLobby(SessionLobby.Custom, lobbyName);
-
-        if (result.Ok)
-        {
-            OnFinishConnection?.Invoke();
-        }
-
-        if (_sessionInfos != null)
-            OnSessionUpdated?.Invoke(_sessionInfos);
-
-    }
-
     void OnValidate()
     {
-        if (!networkRunner)
+        if (!NetworkRunner)
         {
-            networkRunner = FindAnyObjectByType<NetworkRunner>();
+            NetworkRunner = FindAnyObjectByType<NetworkRunner>();
+        }
+    }
+    private void OnDisable()
+    {
+        if (NetworkRunner != null)
+        {
+            NetworkRunner.RemoveCallbacks(this);
         }
     }
 
@@ -114,17 +142,22 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         bool isLocalPlayer = false;
 
-        if(networkRunner.LocalPlayer == player)
+        if(NetworkRunner.LocalPlayer == player)
             isLocalPlayer = true;
 
         Debug.Log($"{player.PlayerId} Joined, Local Player: {isLocalPlayer}");
 
-        OnConnection.Invoke(true);
+        OnSessionJoined?.Invoke(NetworkRunner.SessionInfo);
+
+
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        OnConnection.Invoke(true);
+        //OnConnection.Invoke(true);
+
+        OnSessionJoined?.Invoke(NetworkRunner.SessionInfo);
+
         Debug.Log("Player Left");
     }
 
@@ -141,16 +174,21 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
 
+        if (!NetworkRunner) // Handle NetworkRunner destroyed
+        {
+            NetworkRunner = this.AddComponent<NetworkRunner>();
+            NetworkRunner.AddCallbacks(this);
+        }
+
+        OnConnection.Invoke(SceneType.LobbyMeneScene);
     }
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        OnConnection.Invoke(false);
+        OnConnection.Invoke(SceneType.SessionMenuScene);
     }
     public void OnConnectedToServer(NetworkRunner runner)
     {
-        OnConnection.Invoke(true);
-        // Apply UI of the Players in the sesstion
-        //throw new NotImplementedException();
+        OnConnection.Invoke(SceneType.InGameMenuScene);
     }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {

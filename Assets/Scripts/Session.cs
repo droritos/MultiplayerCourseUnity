@@ -1,3 +1,4 @@
+using Fusion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,7 +7,7 @@ using WebSocketSharp;
 
 public class Session : MonoBehaviour
 {
-    public event UnityAction<string, int> OnEnterSession;
+    public event UnityAction<string,int> OnEnterSession;
 
 
     [SerializeField] TMP_InputField sessionNameInput;
@@ -16,10 +17,19 @@ public class Session : MonoBehaviour
 
     [SerializeField] GameObject uxMessageToPlayer;
 
-    private void Start()
+    private void OnEnable()
     {
         startSesstion.onClick.AddListener(OnStartSessionButtonClicked);
     }
+
+    public void SetInteractables(bool state)
+    {
+        startSesstion.interactable = state;
+        sessionNameInput.interactable = state;
+        maxPlayerAllowed.interactable = state;
+    }
+
+
     private void OnStartSessionButtonClicked() // Button Method
     {
         string sessionName = sessionNameInput.text;
@@ -37,21 +47,8 @@ public class Session : MonoBehaviour
         }
         else
         {
-            startSesstion.interactable = false;
-            sessionNameInput.interactable = false;
-            maxPlayerAllowed.interactable = false;
+            SetInteractables(false);
             OnEnterSession?.Invoke(sessionName, maxPlayers);
         }
     }
-
-    public void SetMaxPlayers()
-    {
-        maxPlayerText.text = maxPlayerAllowed.value.ToString();
-    }
-    public void TryStartSession()
-    {
-        uxMessageToPlayer.SetActive(true);
-    }
-
-
 }

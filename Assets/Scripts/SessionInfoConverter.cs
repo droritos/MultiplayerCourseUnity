@@ -17,9 +17,17 @@ public class SessionInfoConverter : MonoBehaviour
         this.sessionNameText.text = sesstionName;
         playersInfo.text = currentPlayer + "/" + maxPlayers;
     }
-    public void SetJoinAction(string sessionName , NetworkManager networkManager)
+    public void SetJoinAction(string sessionName , NetworkManager networkManager, UnityAction unityAction = default)
     {
         enterSession.onClick.RemoveAllListeners();
         enterSession.onClick.AddListener(() => networkManager.JoinSession(sessionName));
+
+        if(unityAction != default)
+            enterSession.onClick.AddListener(unityAction);
+    }
+
+    public void ButtonIteraction(bool state)
+    {
+        enterSession.interactable = state;
     }
 }

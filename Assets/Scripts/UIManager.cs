@@ -10,6 +10,7 @@ using Fusion;
 public class UIManager : MonoBehaviour
 {
     #region << Events >>
+    public event UnityAction OnJoinedSession;
     public event UnityAction<string> OnEnterLobby;
     public event UnityAction<string, int> OnEnterSession
     {
@@ -17,8 +18,15 @@ public class UIManager : MonoBehaviour
         remove { session.OnEnterSession -= value; }
     }
 
+    public event UnityAction OnLeaveSession
+    {
+        add { InGameSessionMenu.OnLeaveSession += value; }
+        remove { InGameSessionMenu.OnLeaveSession -= value; }
+    }
+
     #endregion
 
+    [SerializeField] SceneType currentScene;
 
     [Header("Lobby Data")]
     [SerializeField] TMP_InputField lobbyInput;
@@ -31,11 +39,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] SessionInfoConverter sessionInfoPrefab;
 
     [Header("Transforms")]
+    [field: SerializeField] public InGameSession InGameSessionMenu { get; private set; }
     [SerializeField] RectTransform sessionParent;
     [SerializeField] RectTransform lobbyMenu;
     [SerializeField] RectTransform sessionMenu;
-    [SerializeField] RectTransform inGameMenu;
-    private List<SessionInfoConverter> _sesstionsList;
+    private List<SessionInfoConverter> _sessionsList = new List<SessionInfoConverter>();
 
     public void JoinLobby() // Button Method
     {
@@ -55,21 +63,23 @@ public class UIManager : MonoBehaviour
     {
         // Clear existing UI
         foreach (Transform child in sessionParent)
+        {
             Destroy(child.gameObject);
+        }
+        _sessionsList.Clear();
 
-        _sesstionsList = new List<SessionInfoConverter>();
         for (int i = 0; i < sessions.Count; i++)
         {
             SessionInfoConverter newSesstion = Instantiate(sessionInfoPrefab, sessionParent);
             newSesstion.UpdateSession(sessions[i].Name, sessions[i].PlayerCount, sessions[i].MaxPlayers);
-            _sesstionsList.Add(newSesstion);
+            _sessionsList.Add(newSesstion);
         }
         Debug.Log($"Created {sessions.Count} Sessions Convertors");
     }
 
     public void SetSessionButton(NetworkManager networkManager)
     {
-        foreach (var SessionInfoConverter in _sesstionsList)
+        foreach (var SessionInfoConverter in _sessionsList)
         {
             SessionInfoConverter.SetJoinAction(SessionInfoConverter.SessionName, networkManager);
         }
@@ -81,19 +91,62 @@ public class UIManager : MonoBehaviour
         totalSessions.text = "Total Sesstion: " + amount.ToString();
     }
 
-    public void HandleConnectionDisplay(bool state)
+    public void HandleConnectionDisplay(SceneType state)
     {
-        if (state)
+        Debug.Log($"HandleConnectionDisplay called with state: {state}");
+
+        if (sessionMenu == null)
         {
-            sessionMenu.gameObject.SetActive(false);
-            inGameMenu.gameObject.SetActive(true);
-
-
-
+            Debug.LogError("sessionMenu reference is null!");
+            return;
         }
-        else
+
+        if (InGameSessionMenu == null)
         {
-
+            Debug.LogError("InGameSessionMenu reference is null!");
+            return;
         }
+
+        if (lobbyMenu == null)
+        {
+            Debug.LogError("lobbyMenu reference is null!");
+            return;
+        }
+
+        switch (state)
+        {
+            case SceneType.LobbyMeneScene:
+                //Debug.Log("Switching to Lobby Menu Scene");
+                sessionMenu.gameObject.SetActive(false);
+                InGameSessionMenu.gameObject.SetActive(false);
+                lobbyMenu.gameObject.SetActive(true);
+
+                enterLobby.interactable = true;
+
+                break;
+
+            case SceneType.SessionMenuScene:
+                //Debug.Log("Switching to Session Menu Scene");
+                lobbyMenu.gameObject.SetActive(false);
+                InGameSessionMenu.gameObject.SetActive(false);
+                sessionMenu.gameObject.SetActive(true);
+
+                foreach (var session in _sessionsList)
+                {
+                    session.ButtonIteraction(true);
+                }
+
+                break;
+
+            case SceneType.InGameMenuScene:
+                //Debug.Log("Switching to In Game Menu Scene");
+                lobbyMenu.gameObject.SetActive(false);
+                InGameSessionMenu.gameObject.SetActive(true);
+                sessionMenu.gameObject.SetActive(false);
+
+                break;
+        }
+
+        //Debug.Log($"After switch - sessionMenu active: {sessionMenu.gameObject.activeSelf}, InGameSessionMenu active: {InGameSessionMenu.gameObject.activeSelf}, lobbyMenu active: {lobbyMenu.gameObject.activeSelf}");
     }
 }

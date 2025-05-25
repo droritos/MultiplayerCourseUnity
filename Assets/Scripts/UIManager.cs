@@ -136,6 +136,7 @@ public class UIManager : MonoBehaviour
                     session.ButtonIteraction(true);
                 }
 
+                session.SetInteractables(true);
                 break;
 
             case SceneType.InGameMenuScene:

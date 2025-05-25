@@ -14,6 +14,11 @@ public class SessionInfoConverter : MonoBehaviour
 
     public void UpdateSession(string sesstionName , int currentPlayer ,int maxPlayers)
     {
+        if (currentPlayer >= maxPlayers)
+            ButtonIteraction(false);
+        else
+            ButtonIteraction(true);
+
         this.sessionNameText.text = sesstionName;
         playersInfo.text = currentPlayer + "/" + maxPlayers;
     }

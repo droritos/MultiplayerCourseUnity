@@ -20,6 +20,7 @@ public class Session : MonoBehaviour
     private void OnEnable()
     {
         startSesstion.onClick.AddListener(OnStartSessionButtonClicked);
+        maxPlayerAllowed.onValueChanged.AddListener(SetPlayersSlider);
     }
 
     public void SetInteractables(bool state)
@@ -27,6 +28,10 @@ public class Session : MonoBehaviour
         startSesstion.interactable = state;
         sessionNameInput.interactable = state;
         maxPlayerAllowed.interactable = state;
+    }
+    public void SetPlayersSlider(float value)
+    {
+        maxPlayerText.text = Mathf.RoundToInt(value).ToString();
     }
 
 

@@ -13,6 +13,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public UnityEvent<SceneType> OnConnection;
 
     [field: SerializeField] public NetworkRunner NetworkRunner {  get; private set; }
+    [SerializeField] NetworkRunner networkPrefab;
 
     private List<SessionInfo> _sessionInfos;
     //private bool _hasStarted = false;
@@ -43,13 +44,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         }
         else
         {
-            Debug.LogError($"Failed to start game: {result.ShutdownReason}");
-            if (!NetworkRunner)
-            {
-                NetworkRunner = this.AddComponent<NetworkRunner>();
-                NetworkRunner.AddCallbacks(this);
-            }
-            OnConnection.Invoke(SceneType.LobbyMeneScene); // Return To Lobby
+            Debug.Log($"Failed to start game: {result.ShutdownReason}");
         }
 
         if (_sessionInfos != null)
@@ -78,13 +73,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         }
         else
         {
-            Debug.LogError($"Failed to start game: {result.ShutdownReason}");
-            if (!NetworkRunner) // Handle NetworkRunner destroyed
-            {
-                NetworkRunner = this.AddComponent<NetworkRunner>();
-                NetworkRunner.AddCallbacks(this);
-            }
-            OnConnection.Invoke(SceneType.LobbyMeneScene); // Return To Lobby
+            //await NetworkRunner.Shutdown();
+            Debug.Log($"Failed to start game: {result.ShutdownReason}");
         }
 
         if (_sessionInfos != null)
@@ -99,6 +89,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         if (result.Ok)
         {
             OnConnection?.Invoke(SceneType.SessionMenuScene);
+        }
+        else
+        {
+            await NetworkRunner.Shutdown();
         }
 
         if (_sessionInfos != null)
@@ -173,12 +167,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-
         if (!NetworkRunner) // Handle NetworkRunner destroyed
         {
-            NetworkRunner = this.AddComponent<NetworkRunner>();
-            NetworkRunner.AddCallbacks(this);
+            Destroy(NetworkRunner.gameObject);
         }
+
+        NetworkRunner = Instantiate(networkPrefab);
+        NetworkRunner.AddCallbacks(this);
+
 
         OnConnection.Invoke(SceneType.LobbyMeneScene);
     }

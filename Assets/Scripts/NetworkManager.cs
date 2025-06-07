@@ -16,7 +16,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] NetworkRunner networkPrefab;
 
     private List<SessionInfo> _sessionInfos;
-    //private bool _hasStarted = false;
+    private const string GAME_SCENE_NAME = "Game Scene";
+
     private void OnEnable()
     {
         NetworkRunner.AddCallbacks(this);
@@ -109,6 +110,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             await NetworkRunner.Shutdown();
         }
     }
+
+    public void StartMatch()
+    {
+        //if(NetworkRunner.)
+        NetworkRunner.LoadScene(GAME_SCENE_NAME);
+    }
+
     private void OnGameStarted(NetworkRunner obj)
     {
         Debug.Log("Game Started");
@@ -186,6 +194,17 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         OnConnection.Invoke(SceneType.InGameMenuScene);
     }
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+        NetworkRunner.RemoveCallbacks(this);
+
+    }
+
+    public void OnSceneLoadStart(NetworkRunner runner)
+    {
+
+    }
+
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
         throw new NotImplementedException();
@@ -224,14 +243,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         throw new NotImplementedException();
     }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-    {
-        throw new NotImplementedException();
-    }
-    public void OnSceneLoadDone(NetworkRunner runner)
-    {
-        throw new NotImplementedException();
-    }
-    public void OnSceneLoadStart(NetworkRunner runner)
     {
         throw new NotImplementedException();
     }

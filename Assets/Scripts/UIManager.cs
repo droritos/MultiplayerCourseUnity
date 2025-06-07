@@ -143,10 +143,23 @@ public class UIManager : MonoBehaviour
                 lobbyMenu.gameObject.SetActive(false);
                 InGameSessionMenu.gameObject.SetActive(true);
                 sessionMenu.gameObject.SetActive(false);
-
                 break;
         }
-
         //Debug.Log($"After switch - sessionMenu active: {sessionMenu.gameObject.activeSelf}, InGameSessionMenu active: {InGameSessionMenu.gameObject.activeSelf}, lobbyMenu active: {lobbyMenu.gameObject.activeSelf}");
+    }
+
+    public void EnableStartMatch(NetworkManager networkManager)
+    {
+        if (!InGameSessionMenu.StartButton) return; 
+
+        InGameSessionMenu.StartButton.enabled = false; 
+        InGameSessionMenu.StartButton.onClick.RemoveAllListeners();
+
+        if (networkManager.NetworkRunner.IsSharedModeMasterClient) // Only Master Client can start the session
+        {
+            InGameSessionMenu.StartButton.onClick.AddListener(networkManager.StartMatch);
+            InGameSessionMenu.StartButton.enabled = true;
+            InGameSessionMenu.StartButton.interactable = true;
+        }
     }
 }

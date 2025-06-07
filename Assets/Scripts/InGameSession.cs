@@ -10,6 +10,8 @@ public class InGameSession : MonoBehaviour
     public event UnityAction OnLeaveSession;
     private SessionInfo _currentSession;
 
+    [field: SerializeField] public Button StartButton {  get; private set; }
+
     [SerializeField] TextMeshProUGUI sessionName;
     [SerializeField] TextMeshProUGUI currentPlayers;
 
@@ -28,7 +30,9 @@ public class InGameSession : MonoBehaviour
         sessionName.text = "In Session: " + _currentSession.Name;
         currentPlayers.text = $"{_currentSession.PlayerCount}/{_currentSession.MaxPlayers}";
 
+        
         returnToLobby.onClick.AddListener(OnLeaveSession);
-
     }
+
+
 }

@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         netsworkManager.OnSessionUpdated += CreateSessions;
-        netsworkManager.OnConnection.AddListener(uiManager.HandleConnectionDisplay);
+        netsworkManager.OnConnection.AddListener(HandleConnectionDisplay);
 
         netsworkManager.OnSessionJoined += (sessionInfo) =>
         {
@@ -51,6 +51,10 @@ public class GameManager : MonoBehaviour
     {
         uiManager.HandleConnectionDisplay(sceneType);
         uiManager.InGameSessionMenu.UpdateInGameInfo(netsworkManager.NetworkRunner);
+
+        uiManager.EnableStartMatch(netsworkManager);
+        //if(netsworkManager.NetworkRunner.atth)
+
     }
 
     private void OnValidate()

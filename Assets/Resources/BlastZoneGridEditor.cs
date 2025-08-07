@@ -21,5 +21,11 @@ public class BlastZoneGridEditor : Editor
         {
             grid.ClearGrid();
         }
+
+        if (GUILayout.Button("Update Start Position"))
+        {
+            grid.SetCurrrentPositionToStartPosition();
+        }
+
     }
 }

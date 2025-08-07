@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8768722300602158209
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 550164344801735603}
+  - component: {fileID: 8944864363826873790}
+  m_Layer: 0
+  m_Name: Map Grid Creator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &550164344801735603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8768722300602158209}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2.36, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8944864363826873790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8768722300602158209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95b7bacd4608b6f4f85da0c346e10290, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  solidBlockPrefab: {fileID: 2613386535304121723, guid: cbf8723712b0add42a9b7c667f242725, type: 3}
+  breakableBlockPrefab: {fileID: 5769655989495610822, guid: 3d3b6685b97b6a8468d1966da41f6dc3, type: 3}
+  floorPrefab: {fileID: 3186044700030797149, guid: 71b437dbe6fa017429532cdd85a5d2a6, type: 3}
+  borderBlockPrefab: {fileID: 298288052717979838, guid: aa01849a2ae46b345b6630fb8ba906f2, type: 3}
+  startPosition: {x: 0, y: -15.5, z: 3.5}
+  width: 18
+  height: 13
+  spacing: 2
+  heightSpacing: 0
+  blockYOffset: 2
+  clearOnGenerate: 1

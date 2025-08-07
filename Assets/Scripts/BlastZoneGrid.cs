@@ -16,7 +16,6 @@ public class BlastZoneGrid : MonoBehaviour
 
     [Header("Grid Offsets")]
     [SerializeField] float spacing = 1f;
-    [SerializeField] float heightSpacing = 0f;       // vertical height change per row
     [SerializeField] float blockYOffset = 2f;      // vertical offset of blocks above the floor
 
     [Header("Other")]
@@ -35,7 +34,7 @@ public class BlastZoneGrid : MonoBehaviour
                 float xOffset = (width - 1) * spacing * 0.5f;
                 float zOffset = (height - 1) * spacing * 0.5f;
 
-                Vector3 pos = startPosition + new Vector3(x * spacing - xOffset, z * heightSpacing, z * spacing - zOffset);
+                Vector3 pos = startPosition + new Vector3(x * spacing - xOffset, z * 0, z * spacing - zOffset);
 
                 if (floorPrefab)
                     Instantiate(floorPrefab, pos, Quaternion.identity, transform);
@@ -70,12 +69,6 @@ public class BlastZoneGrid : MonoBehaviour
     public void SetCurrrentPositionToStartPosition()
     {
         startPosition = this.transform.position;
-    }
-
-
-    private void UpdateTransform()
-    {
-        this.transform.position = startPosition;
     }
 
     private bool IsBorder(int x, int z)

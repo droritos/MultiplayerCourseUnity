@@ -37,9 +37,9 @@ namespace Game.Client
                 return;
             }
 
-            transform.Translate(input.move * (speed * Runner.DeltaTime));
+            var actualMove = new Vector3(input.move.x, 0f, input.move.y);
+            transform.Translate(actualMove * (speed * Runner.DeltaTime));
 
-            // Only done on host:
             if (Object.HasStateAuthority)
             {
                 if (input.buttons.WasPressed(_prevButtons, PlayerInputButtons.PlaceBombButton))

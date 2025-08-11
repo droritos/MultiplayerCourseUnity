@@ -40,6 +40,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2768769131003140932}
+  - component: {fileID: 2423348223999840291}
+  - component: {fileID: -1501282507868208792}
+  - component: {fileID: -2961544859912923273}
+  - component: {fileID: 1983484970020427807}
+  - component: {fileID: 1019019215345026927}
   m_Layer: 0
   m_Name: Skeleton Mage - Character
   m_TagString: Player
@@ -64,6 +69,90 @@ Transform:
   - {fileID: 8211198200142281021}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2423348223999840291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8553295842568774121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 4003945515
+  ObjectInterest: 1
+  Flags: 1
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: -1501282507868208792}
+  - {fileID: -2961544859912923273}
+  - {fileID: 1983484970020427807}
+  - {fileID: 1019019215345026927}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &-1501282507868208792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8553295842568774121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 0}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 
+  TriggerHashes: 
+  TotalWords: 0
+--- !u!114 &-2961544859912923273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8553295842568774121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
+--- !u!114 &1983484970020427807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8553295842568774121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449c0e048734476e94f61ca25f811425, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1019019215345026927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8553295842568774121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4d33af96e6f4545a41dea737882f595, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInput: {fileID: 1983484970020427807}
+  animator: {fileID: 4386964513392600476}
+  speed: 5
 --- !u!1 &8895606459067016251
 GameObject:
   m_ObjectHideFlags: 0

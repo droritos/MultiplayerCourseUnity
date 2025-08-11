@@ -1,86 +1,125 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class BlastZoneGrid : MonoBehaviour
+namespace Game
 {
-    [Header("Grid Blocks")]
-    [SerializeField] GameObject solidBlockPrefab;
-    [SerializeField] GameObject breakableBlockPrefab;
-    [SerializeField] GameObject floorPrefab;
-    [SerializeField] GameObject borderBlockPrefab;
-
-    [Header("Grid Data")]
-    [SerializeField] Vector3 startPosition;
-    [SerializeField] int width = 13;
-    [SerializeField] int height = 11;
-
-    [Header("Grid Offsets")]
-    [SerializeField] float spacing = 1f;
-    [SerializeField] float blockYOffset = 2f;      // vertical offset of blocks above the floor
-
-    [Header("Other")]
-    [SerializeField] bool clearOnGenerate = true;
-
-
-    public void GenerateGrid()
+    [ExecuteInEditMode]
+    public class BlastZoneGrid : MonoBehaviour
     {
-        if (clearOnGenerate)
+        [Header("Grid Blocks")] //
+        [SerializeField] private GameObject solidBlockPrefab;
+        [SerializeField] private GameObject breakableBlockPrefab;
+        [SerializeField] private GameObject floorPrefab;
+        [SerializeField] private GameObject borderBlockPrefab;
+
+        [Header("Grid Data")] //
+        [SerializeField] private Vector3 startPosition;
+        [SerializeField] private int width = 13;
+        [SerializeField] private int height = 11;
+
+        [Header("Grid Offsets")] //
+        [SerializeField] private float spacing = 1f;
+        [SerializeField] private float blockYOffset = 2f; // vertical offset of blocks above the floor
+
+        // ReSharper disable once UnusedMember.Global
+        public void GenerateGrid()
+        {
             ClearGrid();
 
-        for (int x = 0; x < width; x++)
-        {
-            for (int z = 0; z < height; z++)
+            // precalc some values
+            float xOffset = (width - 1) * spacing * 0.5f;
+            float zOffset = (height - 1) * spacing * 0.5f;
+            Vector3 upOffset = Vector3.up * blockYOffset;
+
+            // create subobjects for later
+            GameObject spawnPositions = new GameObject
             {
-                float xOffset = (width - 1) * spacing * 0.5f;
-                float zOffset = (height - 1) * spacing * 0.5f;
+                name = "Spawn Positions",
+                transform = { parent = transform, position = transform.position, rotation = transform.rotation }
+            };
+            GameObject grid = new GameObject
+            {
+                name = "Grid",
+                transform = { parent = transform, position = transform.position, rotation = transform.rotation }
+            };
 
-                Vector3 pos = startPosition + new Vector3(x * spacing - xOffset, z * 0, z * spacing - zOffset);
+            var spawnPositionsTransform = spawnPositions.transform;
+            var gridTransform = grid.transform;
 
-                if (floorPrefab)
-                    Instantiate(floorPrefab, pos, Quaternion.identity, transform);
-
-                if (IsBorder(x, z))
+            for (int x = 0; x < width; x++)
+            {
+                for (int z = 0; z < height; z++)
                 {
-                    Instantiate(borderBlockPrefab, pos + Vector3.up * blockYOffset, Quaternion.identity, transform);
-                }
-                else if (x % 2 == 0 && z % 2 == 0)
-                {
-                    Instantiate(solidBlockPrefab, pos + Vector3.up * blockYOffset, Quaternion.identity, transform);
-                }
-                else
-                {
-                    if (IsSpawnZone(x, z)) continue;
+                    Vector3 pos = startPosition + new Vector3(x * spacing - xOffset, z * 0, z * spacing - zOffset);
 
-                    if (Random.value < 0.7f)
-                        Instantiate(breakableBlockPrefab, pos + Vector3.up * blockYOffset, Quaternion.identity, transform);
+                    // create floor tile
+                    InstantiatePrefabInstance(floorPrefab, pos, Quaternion.identity, grid.transform);
+
+                    // create spawn zone markers and skip blocks
+                    pos += upOffset;
+                    if (IsSpawnZone(x, z))
+                    {
+                        var positionMarker = new GameObject("Spawn Marker");
+                        positionMarker.transform.parent = spawnPositionsTransform;
+                        positionMarker.transform.SetPositionAndRotation(pos, Quaternion.identity);
+                        continue;
+                    }
+
+                    // create block
+                    if (IsBorder(x, z))
+                    {
+                        InstantiatePrefabInstance(borderBlockPrefab, pos, Quaternion.identity, gridTransform);
+                    }
+                    else if (IsSolidBlock(x, z))
+                    {
+                        InstantiatePrefabInstance(solidBlockPrefab, pos, Quaternion.identity, gridTransform);
+                    }
+                    else if (IsBreakableBlock())
+                    {
+                        InstantiatePrefabInstance(breakableBlockPrefab, pos, Quaternion.identity, gridTransform);
+                    }
                 }
             }
         }
-    }
 
-    public void ClearGrid()
-    {
-        for (int i = transform.childCount - 1; i >= 0; i--)
+        public void ClearGrid()
         {
-            DestroyImmediate(transform.GetChild(i).gameObject);
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+            }
         }
-    }
 
-    public void SetCurrrentPositionToStartPosition()
-    {
-        startPosition = this.transform.position;
-    }
+        private GameObject InstantiatePrefabInstance(GameObject original, Vector3 position, Quaternion rotation,
+            Transform parent)
+        {
+#if UNITY_EDITOR
+            var instance = Application.isPlaying
+                ? Instantiate(original)
+                : UnityEditor.PrefabUtility.InstantiatePrefab(original) as GameObject;
+#else
+        var instance = Instantiate(original);
+#endif
 
-    private bool IsBorder(int x, int z)
-    {
-        return x == 0 || x == width - 1 || z == 0 || z == height - 1;
-    }
+            var instanceTransform = instance.transform;
+            instanceTransform.SetParent(parent);
+            instanceTransform.SetPositionAndRotation(position, rotation);
 
-    private bool IsSpawnZone(int x, int z)
-    {
-        return (x <= 1 && z <= 1) ||
-               (x >= width - 2 && z >= height - 2) ||
-               (x <= 1 && z >= height - 2) ||
-               (x >= width - 2 && z <= 1);
+            return instance;
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        public void SetCurrentPositionToStartPosition() => startPosition = this.transform.position;
+
+        private bool IsBorder(int x, int z) => x == 0 || x == width - 1 || z == 0 || z == height - 1;
+
+        private bool IsSpawnZone(int x, int z) =>
+            (x == 1 && z == 1) ||
+            (x == width - 2 && z == height - 2) ||
+            (x == 1 && z == height - 2) ||
+            (x == width - 2 && z == 1);
+
+        private static bool IsBreakableBlock() => Random.value < 0.7f;
+
+        private static bool IsSolidBlock(int x, int z) => x % 2 == 0 && z % 2 == 0;
     }
 }

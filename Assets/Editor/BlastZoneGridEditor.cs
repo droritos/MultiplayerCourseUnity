@@ -1,31 +1,33 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(BlastZoneGrid))]
-public class BlastZoneGridEditor : Editor
+namespace Game.Editor
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(BlastZoneGrid))]
+    public class BlastZoneGridEditor : UnityEditor.Editor
     {
-        DrawDefaultInspector();
-
-        BlastZoneGrid grid = (BlastZoneGrid)target;
-
-        GUILayout.Space(10);
-
-        if (GUILayout.Button("Generate Grid"))
+        public override void OnInspectorGUI()
         {
-            grid.GenerateGrid();
-        }
+            DrawDefaultInspector();
 
-        if (GUILayout.Button("Clear Grid"))
-        {
-            grid.ClearGrid();
-        }
+            BlastZoneGrid grid = (BlastZoneGrid)target;
 
-        if (GUILayout.Button("Update Start Position"))
-        {
-            grid.SetCurrrentPositionToStartPosition();
-        }
+            GUILayout.Space(10);
 
+            if (GUILayout.Button("Generate Grid"))
+            {
+                grid.GenerateGrid();
+            }
+
+            if (GUILayout.Button("Clear Grid"))
+            {
+                grid.ClearGrid();
+            }
+
+            if (GUILayout.Button("Update Start Position"))
+            {
+                grid.SetCurrentPositionToStartPosition();
+            }
+        }
     }
 }

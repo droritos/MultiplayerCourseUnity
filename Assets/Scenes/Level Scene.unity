@@ -14378,6 +14378,7 @@ GameObject:
   - component: {fileID: 1023042516}
   - component: {fileID: 1023042518}
   - component: {fileID: 1023042517}
+  - component: {fileID: 1023042519}
   m_Layer: 0
   m_Name: GameManagers
   m_TagString: Untagged
@@ -14413,6 +14414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameData: {fileID: 11400000, guid: 6abbf3a5f5830754b8413ee3d69bb4d3, type: 2}
+  spawner: {fileID: 0}
 --- !u!114 &1023042518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14431,7 +14433,25 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1023042517}
+  - {fileID: 1023042519}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &1023042519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023042515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c42dec258b449aa8f150f032397e652, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positions:
+  - {fileID: 495017874}
+  - {fileID: 79030016}
+  - {fileID: 781984412}
+  - {fileID: 2059735002}
 --- !u!1001 &1024043013
 PrefabInstance:
   m_ObjectHideFlags: 0

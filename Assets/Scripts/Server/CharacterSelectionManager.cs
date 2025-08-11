@@ -9,7 +9,9 @@ namespace Game.Server
     public class CharacterSelectionManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     {
         [SerializeField] private GameData gameData;
-        private readonly Dictionary<int, PlayerRef> _characterOwners = new();
+        [SerializeField] private GameCharacterSpawner spawner;
+
+        private readonly BidirectionalDictionary<int, PlayerRef> _characterOwners = new();
 
         public event Action<bool, int> OnCharacterRequestResponse;
         public event Action<int[]> OnUpdateCharacterMarkedStatus;
@@ -61,6 +63,16 @@ namespace Game.Server
 
             NotifyCharacterSelectionResultRPC(info.Source, isCharacterAvailable, characterIdx);
             UpdateCharacterMarkStatus();
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All, HostMode = RpcHostMode.SourceIsHostPlayer)]
+        public void MarkReadyRPC(RpcInfo info = default)
+        {
+            Debug.Log($"[Server] Player {info.Source} marked themselves ready, spawning prefab");
+
+            int characterIdx = _characterOwners.Reverse[info.Source];
+            var prefab = gameData.characters[characterIdx].prefab;
+            spawner.SpawnCharacter(prefab, info.Source);
         }
         #endregion
 

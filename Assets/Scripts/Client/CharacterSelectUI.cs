@@ -48,10 +48,10 @@ namespace Game
 
         private void OnPlayerReady()
         {
-            // TODO: proper handling of ready-state
             Debug.Log("Player is now ready...");
             _isPlayerReady = true;
             readyButton.interactable = false;
+            manager.MarkReadyRPC();
             gameObject.SetActive(false);
         }
 

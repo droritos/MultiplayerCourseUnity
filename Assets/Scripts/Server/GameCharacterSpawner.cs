@@ -23,6 +23,7 @@ namespace Game.Server
 
         private void Awake()
         {
+            // shuffle spawn points
             var random = new  System.Random();
             for(int i = 0; i < positions.Count - 1; i++)
             {

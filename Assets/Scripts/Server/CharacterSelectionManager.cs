@@ -65,10 +65,10 @@ namespace Game.Server
             UpdateCharacterMarkStatus();
         }
 
-        [Rpc(RpcSources.All, RpcTargets.All, HostMode = RpcHostMode.SourceIsHostPlayer)]
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
         public void MarkReadyRPC(RpcInfo info = default)
         {
-            Debug.Log($"[Server] Player {info.Source} marked themselves ready, spawning prefab");
+            Debug.Log($"[Server] Player {info.Source} marked themselves ready, spawn relevant prefab");
 
             int characterIdx = _characterOwners.Reverse[info.Source];
             var prefab = gameData.characters[characterIdx].prefab;

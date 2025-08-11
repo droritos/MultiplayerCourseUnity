@@ -65,7 +65,8 @@
         "Assembly-CSharp-firstpass",
         "Fusion.Addons.Physics",
         "Fusion.Addons.FSM",
-        "Game"
+        "Game.Client",
+        "Game.Server"
     ],
     "UseSerializableDictionary": true,
     "NullChecksForNetworkedProperties": true,

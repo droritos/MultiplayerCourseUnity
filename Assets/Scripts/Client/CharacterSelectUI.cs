@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Game.Server;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,6 +16,7 @@ namespace Game
         [SerializeField] private Button readyButton;
 
         private readonly List<Button> _characterButtons = new();
+        private int[] _lastOccupied = Array.Empty<int>();
         private int _selectedCharacterIdx;
         private bool _isPlayerReady;
 
@@ -75,21 +77,32 @@ namespace Game
             manager.RequestCharacterRPC(characterIdx);
         }
 
-        private void ManagerOnOnUpdateCharacterMarkedStatus(List<int> takenCharacters)
+        private void ManagerOnOnUpdateCharacterMarkedStatus(int[] occupiedCharacters)
         {
-            foreach (int characterIdx in takenCharacters)
+            if (_lastOccupied.AsSpan().SequenceEqual(occupiedCharacters.AsSpan()))
             {
-                var button =  _characterButtons[characterIdx];
-                if (characterIdx == _selectedCharacterIdx)
+                return;
+            }
+
+            var occupiedHashset = new HashSet<int>(occupiedCharacters);
+            for (int i = 0; i < _characterButtons.Count; ++i)
+            {
+                var button = _characterButtons[i];
+                if (!occupiedHashset.Contains(i))
+                {
+                    button.interactable = true;
+                    continue;
+                }
+
+                button.interactable = false;
+                if (i == _selectedCharacterIdx)
                 {
                     Debug.Log("This is my character!");
-                    button.interactable = false;
-                }
-                else
-                {
-                    button.interactable = false;
+                    // TODO: set appropriate sprite here?
                 }
             }
+
+            _lastOccupied = occupiedCharacters;
         }
 
         private void ManagerOnOnCharacterRequestResponse(bool result, int characterIdx)

@@ -9,20 +9,22 @@ namespace Game.Server
     public class CharacterSelectionManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     {
         [SerializeField] private GameData gameData;
-
         private readonly Dictionary<int, PlayerRef> _characterOwners = new();
 
-        public void PlayerJoined(PlayerRef player) => UpdateCharacterMarkStatusRPC();
+        public event Action<bool, int> OnCharacterRequestResponse;
+        public event Action<int[]> OnUpdateCharacterMarkedStatus;
+
+        #region Player Connection Callbacks
+        public void PlayerJoined(PlayerRef player) => UpdateCharacterMarkStatus();
 
         public void PlayerLeft(PlayerRef player)
         {
             FreePlayerCurrentCharacter(player);
-            UpdateCharacterMarkStatusRPC();
+            UpdateCharacterMarkStatus();
         }
+        #endregion
 
-        public event Action<bool, int> OnCharacterRequestResponse;
-        public event Action<List<int>> OnUpdateCharacterMarkedStatus;
-
+        #region Character Management
         private void FreePlayerCurrentCharacter(PlayerRef player)
         {
             if (!_characterOwners.ContainsValue(player))
@@ -33,60 +35,42 @@ namespace Game.Server
             var ownedCharacter = _characterOwners.First(kvp => kvp.Value.Equals(player));
 
             _characterOwners.Remove(ownedCharacter.Key);
-            Debug.Log($"Player {player} freed character {ownedCharacter.Key}");
+            Debug.Log($"[Server] Player {player} freed character {ownedCharacter.Key}");
         }
 
-        #region RPCs
+        private void UpdateCharacterMarkStatus()
+        {
+            int[] occupied = _characterOwners.Keys.ToArray();
+            Debug.Log($"[Server] Broadcasting character status to all clients: {string.Join(",", occupied)}");
+            BroadcastOccupiedCharactersRPC(occupied);
+        }
+        #endregion
 
+        #region Inbound RPCs
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
         public void RequestCharacterRPC(int characterIdx, RpcInfo info = default)
         {
-            Debug.Log("Requested character idx");
-            bool isCharacterFreed = !_characterOwners.ContainsKey(characterIdx);
+            Debug.Log($"[Server] Requested character \"{gameData.characters[characterIdx].name}\" ({characterIdx})");
+            bool isCharacterAvailable = !_characterOwners.ContainsKey(characterIdx);
 
-            FreePlayerCurrentCharacter(info.Source);
-
-            if (isCharacterFreed)
+            if (isCharacterAvailable)
             {
+                FreePlayerCurrentCharacter(info.Source);
                 _characterOwners.Add(characterIdx, info.Source);
             }
 
-            ReturnCharacterRequestAnswerRPC(info.Source, isCharacterFreed, characterIdx);
-            UpdateCharacterMarkStatusRPC();
+            NotifyCharacterSelectionResultRPC(info.Source, isCharacterAvailable, characterIdx);
+            UpdateCharacterMarkStatus();
         }
+        #endregion
 
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
-        private void RequestCharacterFreeRPC(int characterIdx, RpcInfo info = default)
-        {
-            if (!_characterOwners.TryGetValue(characterIdx, out var owner))
-            {
-                Debug.Log("Character is free, no need to return it");
-                return;
-            }
-
-            if (owner != info.Source)
-            {
-                Debug.Log("Cannot free a character that isn't yours");
-                return;
-            }
-
-            if (!_characterOwners.Remove(characterIdx))
-            {
-                Debug.Log("Character is free, no need to return it");
-                return;
-            }
-
-            UpdateCharacterMarkStatusRPC();
-        }
-
+        #region Outbound RPCs
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void ReturnCharacterRequestAnswerRPC([RpcTarget] PlayerRef player, bool canUseCharacter,
+        private void NotifyCharacterSelectionResultRPC([RpcTarget] PlayerRef player, bool canUseCharacter,
             int characterIdx) => OnCharacterRequestResponse?.Invoke(canUseCharacter, characterIdx);
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void UpdateCharacterMarkStatusRPC() =>
-            OnUpdateCharacterMarkedStatus?.Invoke(_characterOwners.Keys.ToList());
-
+        private void BroadcastOccupiedCharactersRPC(int[] occupiedCharacterIndices) => OnUpdateCharacterMarkedStatus?.Invoke(occupiedCharacterIndices);
         #endregion
     }
 }

@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 
 namespace Game
@@ -131,7 +132,8 @@ namespace Game
                     Vector3 pos = startPosition + new Vector3(x * spacing - xOffset, blockYOffset, z * spacing - zOffset);
                     if (IsBreakableBlock(x, z))
                     {
-                        InstantiatePrefabInstance(breakableBlockPrefab, pos, Quaternion.identity, gridTransform);
+                        var block = InstantiatePrefabInstance(breakableBlockPrefab, pos, Quaternion.identity, gridTransform);
+                        block.AddComponent<NetworkObject>();
                     }
                 }
             }

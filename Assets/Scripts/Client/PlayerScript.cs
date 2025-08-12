@@ -55,6 +55,11 @@ namespace Game.Client
                 transform.rotation = Quaternion.LookRotation(actualMove);
             }
 
+            if (_isSprinting)
+            {
+                deltaMove *= 1.5f;
+            }
+
             if (!Physics.SphereCast(transform.position, capsuleCollider.radius, actualMove.normalized, out RaycastHit hit, deltaMove.magnitude, LayerMask.GetMask("Default")))
             {
                 transform.position += deltaMove;
@@ -69,11 +74,11 @@ namespace Game.Client
 
                 if (input.buttons.WasPressed(_prevButtons, PlayerInputButtons.SprintButton))
                 {
-                    Debug.Log("sprint began!");
+                    _isSprinting = true;
                 }
                 else if (input.buttons.WasReleased(_prevButtons, PlayerInputButtons.SprintButton))
                 {
-                    Debug.Log("sprint ended!");
+                    _isSprinting = false;
                 }
             }
 

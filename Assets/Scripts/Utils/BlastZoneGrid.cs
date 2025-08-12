@@ -12,15 +12,7 @@ namespace Game
         [SerializeField] private GameObject floorPrefab;
         [SerializeField] private GameObject borderBlockPrefab;
 
-        [Header("Grid Data")] //
-        [SerializeField] private Vector3 startPosition;
-        [SerializeField] private int width = 13;
-        [SerializeField] private int height = 11;
-
-        [Header("Grid Offsets")] //
-        [SerializeField] private float spacing = 1f;
-        [SerializeField] private float blockYOffset = 2f; // vertical offset of blocks above the floor
-        [SerializeField] private float seed = 1;
+        [SerializeField] private GridData gridData;
 
         [Header("Grid Objects")]
         [SerializeField] private Transform gridCollidersTransform;
@@ -34,15 +26,15 @@ namespace Game
             ClearGridBase();
 
             // precalc some values
-            float xOffset = (width - 1) * spacing * 0.5f;
-            float zOffset = (height - 1) * spacing * 0.5f;
-            Vector3 upOffset = Vector3.up * blockYOffset;
+            float xOffset = (gridData.width - 1) * gridData.spacing * 0.5f;
+            float zOffset = (gridData.height - 1) * gridData.spacing * 0.5f;
+            Vector3 upOffset = Vector3.up * gridData.blockYOffset;
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < gridData.width; x++)
             {
-                for (int z = 0; z < height; z++)
+                for (int z = 0; z < gridData.height; z++)
                 {
-                    Vector3 pos = startPosition + new Vector3(x * spacing - xOffset, z * 0, z * spacing - zOffset);
+                    Vector3 pos = gridData.startPosition + new Vector3(x * gridData.spacing - xOffset, z * 0, z * gridData.spacing - zOffset);
 
                     // create floor tile
                     InstantiatePrefabInstance(floorPrefab, pos, Quaternion.identity, gridBaseTransform);
@@ -79,13 +71,13 @@ namespace Game
         private void SpawnColliders()
         {
             // spawn floor collider
-            SpawnCollider("Floor", startPosition, new Vector3(width * 2, 2, height * 2));
+            SpawnCollider("Floor", gridData.startPosition, new Vector3(gridData.width * 2, 2, gridData.height * 2));
 
             // spawn floor collider
-            SpawnCollider("Left", startPosition + new Vector3(-width + 0.5f*2, blockYOffset, 0), new Vector3(2, 2, height * 2));
-            SpawnCollider("Right", startPosition + new Vector3(width - 0.5f*2, blockYOffset, 0), new Vector3(2, 2, height * 2));
-            SpawnCollider("Top", startPosition + new Vector3(0, blockYOffset, height - 0.5f*2), new Vector3(width * 2, 2, 2));
-            SpawnCollider("Bottom", startPosition + new Vector3(0, blockYOffset, -height + 0.5f*2), new Vector3(width * 2, 2, 2));
+            SpawnCollider("Left", gridData.startPosition + new Vector3(-gridData.width + 0.5f*2, gridData.blockYOffset, 0), new Vector3(2, 2, gridData.height * 2));
+            SpawnCollider("Right", gridData.startPosition + new Vector3(gridData.width - 0.5f*2, gridData.blockYOffset, 0), new Vector3(2, 2, gridData.height * 2));
+            SpawnCollider("Top", gridData.startPosition + new Vector3(0, gridData.blockYOffset, gridData.height - 0.5f*2), new Vector3(gridData.width * 2, 2, 2));
+            SpawnCollider("Bottom", gridData.startPosition + new Vector3(0, gridData.blockYOffset, -gridData.height + 0.5f*2), new Vector3(gridData.width * 2, 2, 2));
         }
 
         private void SpawnCollider(string colliderName, Vector3 position, Vector3 scale)
@@ -123,13 +115,13 @@ namespace Game
             ClearGridContents();
 
             // precalc some values
-            float xOffset = (width - 1) * spacing * 0.5f;
-            float zOffset = (height - 1) * spacing * 0.5f;
-            for (int x = 1; x < width-1; x++)
+            float xOffset = (gridData.width - 1) * gridData.spacing * 0.5f;
+            float zOffset = (gridData.height - 1) * gridData.spacing * 0.5f;
+            for (int x = 1; x < gridData.width-1; x++)
             {
-                for (int z = 1; z < height-1; z++)
+                for (int z = 1; z < gridData.height-1; z++)
                 {
-                    Vector3 pos = startPosition + new Vector3(x * spacing - xOffset, blockYOffset, z * spacing - zOffset);
+                    Vector3 pos = gridData.startPosition + new Vector3(x * gridData.spacing - xOffset, gridData.blockYOffset, z * gridData.spacing - zOffset);
                     if (IsBreakableBlock(x, z))
                     {
                         var block = InstantiatePrefabInstance(breakableBlockPrefab, pos, Quaternion.identity, gridTransform);
@@ -166,22 +158,22 @@ namespace Game
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void SetCurrentPositionToStartPosition() => startPosition = this.transform.position;
+        public void SetCurrentPositionToStartPosition() => gridData.startPosition = this.transform.position;
 
-        private bool IsBorder(int x, int z) => x == 0 || x == width - 1 || z == 0 || z == height - 1;
+        private bool IsBorder(int x, int z) => x == 0 || x == gridData.width - 1 || z == 0 || z == gridData.height - 1;
 
         private bool IsSpawnZone(int x, int z) =>
             (x == 1 && z == 1) ||
-            (x == width - 2 && z == height - 2) ||
-            (x == 1 && z == height - 2) ||
-            (x == width - 2 && z == 1);
+            (x == gridData.width - 2 && z == gridData.height - 2) ||
+            (x == 1 && z == gridData.height - 2) ||
+            (x == gridData.width - 2 && z == 1);
 
 
         private bool IsAdjacentToSpawnZone(int x, int z) =>
             (Mathf.Abs(x - 1) <= 1 && Mathf.Abs(z - 1) <= 1) ||
-            (Mathf.Abs(x - (width - 2)) <= 1 && Mathf.Abs(z - (height - 2)) <= 1) ||
-            (Mathf.Abs(x - 1) <= 1 && Mathf.Abs(z - (height - 2)) <= 1) ||
-            (Mathf.Abs(x - (width - 2)) <= 1 && Mathf.Abs(z - 1) <= 1);
+            (Mathf.Abs(x - (gridData.width - 2)) <= 1 && Mathf.Abs(z - (gridData.height - 2)) <= 1) ||
+            (Mathf.Abs(x - 1) <= 1 && Mathf.Abs(z - (gridData.height - 2)) <= 1) ||
+            (Mathf.Abs(x - (gridData.width - 2)) <= 1 && Mathf.Abs(z - 1) <= 1);
 
         private bool IsBreakableBlock(int x, int z) =>
             !IsAdjacentToSpawnZone(x, z) && !IsSolidBlock(x, z) && !IsBorder(x,z) && (Random.value < 0.7);

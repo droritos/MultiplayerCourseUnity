@@ -6,5 +6,9 @@ namespace Game
     public class GameData : ScriptableObject
     {
         public CharacterData[] characters;
+
+        [Header("Prefabs")]
+        public GameObject bombPrefab;
+        public GameObject explosionVFX;
     }
 }

@@ -1,5 +1,5 @@
-﻿using System;
-using Fusion;
+﻿using Fusion;
+using Game.Server;
 using UnityEngine;
 
 namespace Game.Client
@@ -69,7 +69,7 @@ namespace Game.Client
             {
                 if (input.buttons.WasPressed(_prevButtons, PlayerInputButtons.PlaceBombButton))
                 {
-                    Debug.Log("Place bomb");
+                    GameManagerRequestBroker.RequestBomb(transform.position + transform.forward * 2);
                 }
 
                 if (input.buttons.WasPressed(_prevButtons, PlayerInputButtons.SprintButton))

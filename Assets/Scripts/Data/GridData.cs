@@ -13,5 +13,45 @@ namespace Game
         [Header("Grid Offsets")]
         public float spacing = 1f;
         public float blockYOffset = 2f;
+
+        // Cached values to avoid repeated calculations
+        private float _cachedXOffset;
+        private float _cachedZOffset;
+        private float _inverseSpacing;
+
+        private void OnValidate() => CacheOffsets();
+        private void CacheOffsets()
+        {
+            _cachedXOffset = (width - 1) * spacing * 0.5f;
+            _cachedZOffset = (height - 1) * spacing * 0.5f;
+            _inverseSpacing = 1f / spacing;
+        }
+
+        public Vector3 GridPositionToWorldPosition(int x, int z) =>
+            new(
+                startPosition.x + x * spacing - _cachedXOffset,
+                startPosition.y + blockYOffset,
+                startPosition.z + z * spacing - _cachedZOffset
+            );
+
+        public (int x, int z) WorldPositionToGridPosition(Vector3 worldPos)
+        {
+            // Calculate relative position and convert to grid coordinates in one step
+            int x = Mathf.RoundToInt((worldPos.x - startPosition.x + _cachedXOffset) * _inverseSpacing);
+            int z = Mathf.RoundToInt((worldPos.z - startPosition.z + _cachedZOffset) * _inverseSpacing);
+
+            return (x, z);
+        }
+
+        public Vector3 AlignToClosestGridPosition(Vector3 worldPos)
+        {
+            var (x, z) = WorldPositionToGridPosition(worldPos);
+
+            // Clamp to grid bounds
+            x = Mathf.Clamp(x, 0, width - 1);
+            z = Mathf.Clamp(z, 0, height - 1);
+
+            return GridPositionToWorldPosition(x, z);
+        }
     }
 }

@@ -50,9 +50,14 @@ namespace Game.Client
             var actualMove = new Vector3(input.move.x, 0f, input.move.y);
             var deltaMove = actualMove * (speed * Runner.DeltaTime);
 
+            if (actualMove != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(actualMove);
+            }
+
             if (!Physics.SphereCast(transform.position, capsuleCollider.radius, actualMove.normalized, out RaycastHit hit, deltaMove.magnitude, LayerMask.GetMask("Default")))
             {
-                transform.Translate(deltaMove);
+                transform.position += deltaMove;
             }
 
             if (Object.HasStateAuthority)

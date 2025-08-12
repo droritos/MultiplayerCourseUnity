@@ -5,7 +5,6 @@ using Fusion.Sockets;
 using Game.Client.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 namespace Game.Client
 {

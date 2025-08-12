@@ -14,15 +14,33 @@ namespace Game.Editor
 
             GUILayout.Space(10);
 
-            if (GUILayout.Button("Generate Grid"))
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Generate Grid Contents"))
             {
-                grid.GenerateGrid();
+                grid.GenerateGridContents();
             }
 
-            if (GUILayout.Button("Clear Grid"))
+            if (GUILayout.Button("Clear Grid Contents"))
             {
-                grid.ClearGrid();
+                grid.ClearGridContents();
             }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Generate Grid Base"))
+            {
+                grid.GenerateGridBase();
+            }
+
+            if (GUILayout.Button("Clear Grid Base"))
+            {
+                grid.ClearGridBase();
+            }
+
+            GUILayout.EndHorizontal();
 
             if (GUILayout.Button("Update Start Position"))
             {

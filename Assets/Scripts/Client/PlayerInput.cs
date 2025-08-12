@@ -59,8 +59,6 @@ namespace Game.Client
         {
             if (!HasInputAuthority) return;
 
-            Debug.Log($"Raw input move: {_move}");
-
             var inputState = new PlayerInputState { move = _move };
             inputState.buttons.Set(PlayerInputButtons.SprintButton, _inputSystemActions.Player.Sprint.IsPressed());
             inputState.buttons.Set(PlayerInputButtons.PlaceBombButton, _inputSystemActions.Player.PlaceBomb.IsPressed());

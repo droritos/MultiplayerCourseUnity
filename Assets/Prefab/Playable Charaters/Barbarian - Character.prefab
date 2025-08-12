@@ -41,6 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4719344765186773555}
+  - component: {fileID: 2993164160091487496}
   - component: {fileID: 172884693727814525}
   - component: {fileID: -1363554710681983122}
   - component: {fileID: -6127725408114736880}
@@ -70,6 +71,29 @@ Transform:
   - {fileID: 5931403149585239223}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &2993164160091487496
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8496062800840687072}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2.2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!114 &172884693727814525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,12 +128,12 @@ MonoBehaviour:
   m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animator: {fileID: 0}
+  Animator: {fileID: 3181017151794144192}
   ApplyTiming: 2
   SyncSettings: 79
-  StateHashes: 
-  TriggerHashes: 
-  TotalWords: 0
+  StateHashes: 0000000013a2de07d1d01fa5f5620a77c6d12f40a1609f62d8aa0cc42afa8626a8b5caa334c163f2077246c52b1a167c44563d8ba8f6ef9205b3f631238331799a56be64e2464665809f03c0
+  TriggerHashes: 00000000
+  TotalWords: 3
 --- !u!114 &-6127725408114736880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInput: {fileID: -2039830915118420879}
   animator: {fileID: 3181017151794144192}
+  capsuleCollider: {fileID: 2993164160091487496}
   speed: 5
 --- !u!1 &8715335388581760607
 GameObject:

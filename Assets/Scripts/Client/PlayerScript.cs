@@ -4,12 +4,14 @@ using UnityEngine;
 
 namespace Game.Client
 {
+    [RequireComponent(typeof(CapsuleCollider))]
     [RequireComponent(typeof(NetworkMecanimAnimator))]
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerScript : NetworkBehaviour
     {
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private Animator animator;
+        [SerializeField] private CapsuleCollider capsuleCollider;
         [SerializeField] private float speed = 5f;
 
         private bool _isSprinting;
@@ -27,6 +29,14 @@ namespace Game.Client
             {
                 playerInput = GetComponent<PlayerInput>();
             }
+
+            if (!capsuleCollider)
+            {
+                capsuleCollider = GetComponent<CapsuleCollider>();
+            }
+
+            var networkMechanim = GetComponent<NetworkMecanimAnimator>();
+            networkMechanim.Animator = animator;
         }
 #endif
 
@@ -38,7 +48,12 @@ namespace Game.Client
             }
 
             var actualMove = new Vector3(input.move.x, 0f, input.move.y);
-            transform.Translate(actualMove * (speed * Runner.DeltaTime));
+            var deltaMove = actualMove * (speed * Runner.DeltaTime);
+
+            if (!Physics.SphereCast(transform.position, capsuleCollider.radius, actualMove.normalized, out RaycastHit hit, deltaMove.magnitude, LayerMask.GetMask("Default")))
+            {
+                transform.Translate(deltaMove);
+            }
 
             if (Object.HasStateAuthority)
             {

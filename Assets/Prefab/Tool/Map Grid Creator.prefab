@@ -270,37 +270,6 @@ Transform:
   - {fileID: 4912822982509237562}
   m_Father: {fileID: 550164344801735603}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6342419405431796108
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2976313507069396163}
-  m_Layer: 0
-  m_Name: Grid
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2976313507069396163
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6342419405431796108}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 550164344801735603}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6816948333867346649
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,7 +765,6 @@ Transform:
   - {fileID: 3350613177596156625}
   - {fileID: 828190465695976880}
   - {fileID: 4752059210205093935}
-  - {fileID: 2976313507069396163}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8944864363826873790
@@ -824,7 +792,7 @@ MonoBehaviour:
   gridCollidersTransform: {fileID: 3350613177596156625}
   spawnPositionsTransform: {fileID: 4752059210205093935}
   gridBaseTransform: {fileID: 828190465695976880}
-  gridTransform: {fileID: 2976313507069396163}
+  gridTransform: {fileID: 0}
 --- !u!1 &9046617050053722432
 GameObject:
   m_ObjectHideFlags: 0

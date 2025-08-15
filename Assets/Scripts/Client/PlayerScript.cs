@@ -6,7 +6,6 @@ using UnityEngine;
 namespace Game.Client
 {
     [RequireComponent(typeof(CapsuleCollider))]
-    [RequireComponent(typeof(NetworkMecanimAnimator))]
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerScript : NetworkBehaviour
     {
@@ -17,7 +16,6 @@ namespace Game.Client
 
         private bool _isSprinting;
         private NetworkButtons _prevButtons;
-        //private NetworkMecanimAnimator _networkAnimator;
 
         private const float _speedMultiplier = 1.5f;
 
@@ -39,7 +37,7 @@ namespace Game.Client
                 capsuleCollider = GetComponent<CapsuleCollider>();
             }
 
-            var networkAnimator = GetComponent<NetworkMecanimAnimator>();
+            var networkAnimator = GetComponentInChildren<NetworkMecanimAnimator>();
             networkAnimator.Animator = animator;
         }
 #endif

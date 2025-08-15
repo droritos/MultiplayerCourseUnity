@@ -1,6 +1,6 @@
 using DG.Tweening;
-using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BombVfx : VfxController
@@ -24,6 +24,10 @@ public class BombVfx : VfxController
     [SerializeField] private float popScale = 1.5f;
     [SerializeField] private float popTime = 0.2f;
 
+    [Header("Explode Positions")]
+    [SerializeField] private List<Transform> _explodePositions;
+
+
 #if UNITY_EDITOR // Test in Editor
     protected override void OnEnable()
     {
@@ -31,7 +35,7 @@ public class BombVfx : VfxController
         TestPlay();
     }
 #endif
-    [ContextMenu("Test Play (3s)")]
+    [ContextMenu("Test Play (5s)")]
     private void TestPlay() => Play(5f);
 
     /// <summary>
@@ -88,9 +92,9 @@ public class BombVfx : VfxController
             // Randomly choose between left-right (Z) or top-down (X)
             Vector3 axis;
             if (Random.value < 0.5f)
-                axis = new Vector3(0, 0, wiggleAngle); // left–right tilt
+                axis = new Vector3(0, 0, wiggleAngle); // leftâ€“right tilt
             else
-                axis = new Vector3(wiggleAngle, 0, 0); // top–down tilt
+                axis = new Vector3(wiggleAngle, 0, 0); // topâ€“down tilt
 
             sequence.Append(
                 target.DORotate(axis, wiggleStep * 0.5f)
@@ -127,7 +131,9 @@ public class BombVfx : VfxController
     #region Particle helpers
     protected override void OnComplete()
     {
-        PlayExplosionEffects(new List<Vector3> { transform.position }); // Temporary, for testing Until gifure out how to pass positions of Blocks\Tiles
+        List<Vector3> explodePositions = _explodePositions.Select(t => t.position).ToList();
+
+        PlayExplosionEffects(explodePositions); // Temporary, for testing Until gifure out how to pass positions of Blocks\Tiles
         base.OnComplete();
     }
     private void StartFuseEffect()

@@ -1,5 +1,6 @@
-﻿using Fusion;
+using Fusion;
 using Game.Server;
+using Game.Data;
 using UnityEngine;
 
 namespace Game.Client
@@ -16,6 +17,9 @@ namespace Game.Client
 
         private bool _isSprinting;
         private NetworkButtons _prevButtons;
+        //private NetworkMecanimAnimator _networkAnimator;
+
+        private const float _speedMultiplier = 1.5f;
 
 #if UNITY_EDITOR
         private void OnValidate()
@@ -35,8 +39,8 @@ namespace Game.Client
                 capsuleCollider = GetComponent<CapsuleCollider>();
             }
 
-            var networkMechanim = GetComponent<NetworkMecanimAnimator>();
-            networkMechanim.Animator = animator;
+            var networkAnimator = GetComponent<NetworkMecanimAnimator>();
+            networkAnimator.Animator = animator;
         }
 #endif
 
@@ -57,19 +61,28 @@ namespace Game.Client
 
             if (_isSprinting)
             {
-                deltaMove *= 1.5f;
+                deltaMove *= _speedMultiplier;
             }
 
             if (!Physics.SphereCast(transform.position, capsuleCollider.radius, actualMove.normalized, out RaycastHit hit, deltaMove.magnitude, LayerMask.GetMask("Default")))
             {
                 transform.position += deltaMove;
+
+                float speedPercent = actualMove.magnitude;
+                if (_isSprinting)
+                    speedPercent *= _speedMultiplier;
+
+                animator.SetFloat(AnimatorParams.Speed, speedPercent);
             }
 
             if (Object.HasStateAuthority)
             {
                 if (input.buttons.WasPressed(_prevButtons, PlayerInputButtons.PlaceBombButton))
                 {
-                    GameManagerRequestBroker.RequestBomb(transform.position + transform.forward * 2);
+                    GameManagerRequestBroker.RequestBomb(transform.position /* + transform.forward * 2*/);
+
+                    animator.SetInteger(AnimatorParams.State, (int)PlayerState.PlacingBomb);
+
                 }
 
                 if (input.buttons.WasPressed(_prevButtons, PlayerInputButtons.SprintButton))

@@ -8,19 +8,19 @@ namespace Game.Client
         public event UnityAction OnBombCountChanged;
         public event UnityAction OnBombUseFailed;
 
-        public int MaxPossessedBombCount { get; private set; } = 1; // Default to 1 bomb
+        public int TotalBombs { get; private set; } = 1; // Default to 1 bomb
 
-        private int _currentBombCount; // _currentBombCount/MaxPossessedBombCount - GUI
-
+        private int _currentBombCount; // _currentBombCount/TotalBombs - GUI
         public int CurrentBombCount
         {
             get => _currentBombCount;
             set
             {
-                int newValue = Mathf.Clamp(value, 0, MaxPossessedBombCount);
+                int newValue = Mathf.Clamp(value, 0, TotalBombs);
                 if (_currentBombCount != newValue)
                 {
                     _currentBombCount = newValue;
+                    Debug.Log($"Current Bomb Count Updated: {_currentBombCount}");
                     OnBombCountChanged?.Invoke();
                 }
             }
@@ -33,13 +33,17 @@ namespace Game.Client
 
         public void UpdateInventory()
         {
-            CurrentBombCount = MaxPossessedBombCount; // Initialize with max bomb count
+            CurrentBombCount = TotalBombs; // Initialize with max bomb count
         }
 
         public void AddBombCount()
         {
-            MaxPossessedBombCount++;
+            TotalBombs++;
             UpdateInventory();
+        }
+        public void RestoreBombCount()
+        {
+            CurrentBombCount++;
         }
 
         public bool TryUseBomb()

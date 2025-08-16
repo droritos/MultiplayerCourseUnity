@@ -26,7 +26,7 @@ namespace Game.Client
             base.Spawned();
             Inventory = new PlayerInventory();
 
-            //Inventory.OnBombUseFailed += ShowNoBombFeedback; // Subscribe to bomb use failure feedback
+            //Inventory.OnBombUseFailed += ShowNoBombFeedback; // Subscribe to bomb use failure feedback - GUI or sound feedback
         }
 
 #if UNITY_EDITOR

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -18,7 +18,10 @@ namespace Game.Server
 
             var position = positions[^1].position;
             positions.RemoveAt(positions.Count - 1);
-            Runner.Spawn(prefab, position: position, inputAuthority: player);
+
+            NetworkObject playerObject = Runner.Spawn(prefab, position: position, inputAuthority: player);
+            Runner.SetPlayerObject(player, playerObject);
+
         }
 
         private void Awake()

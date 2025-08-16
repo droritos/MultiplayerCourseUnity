@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Game
 {
@@ -10,5 +10,7 @@ namespace Game
         [Header("Prefabs")]
         public GameObject bombPrefab;
         public GameObject explosionVFX;
+
+        public GameObject pickUpPrefab;
     }
 }

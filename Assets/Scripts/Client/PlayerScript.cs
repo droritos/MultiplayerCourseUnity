@@ -9,6 +9,8 @@ namespace Game.Client
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerScript : NetworkBehaviour
     {
+        public PlayerInventory Inventory { get; private set; }
+
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private Animator animator;
         [SerializeField] private CapsuleCollider capsuleCollider;
@@ -18,6 +20,14 @@ namespace Game.Client
         private NetworkButtons _prevButtons;
 
         private const float _speedMultiplier = 1.5f;
+
+        public override void Spawned()
+        {
+            base.Spawned();
+            Inventory = new PlayerInventory();
+
+            //Inventory.OnBombUseFailed += ShowNoBombFeedback; // Subscribe to bomb use failure feedback
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()
@@ -77,7 +87,9 @@ namespace Game.Client
             {
                 if (input.buttons.WasPressed(_prevButtons, PlayerInputButtons.PlaceBombButton))
                 {
-                    GameManagerRequestBroker.RequestBomb(transform.position /* + transform.forward * 2*/);
+                    if(!Inventory.TryUseBomb()) return; // If no bombs available, exit early
+
+                    GameManagerRequestBroker.RequestBomb(transform.position); // Player always get a bomb so why "RequestBomb"
 
                     animator.SetInteger(AnimatorParams.State, (int)PlayerState.PlacingBomb);
 

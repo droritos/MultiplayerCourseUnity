@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using Fusion;
 using UnityEngine;
 
@@ -18,12 +18,12 @@ namespace Game.Server
         {
             Debug.Log("[Server] Placing bomb in location");
             position = gridData.AlignToClosestGridPosition(position);
-            var bombInstance = Runner.Spawn(gameData.bombPrefab, position);
+            NetworkObject bombInstance = Runner.Spawn(gameData.bombPrefab, position);
 
             StartCoroutine(BombExplosionCoroutine(position, bombInstance));
         }
 
-        IEnumerator BombExplosionCoroutine(Vector3 bombPosition, NetworkObject bombInstance)
+        private IEnumerator BombExplosionCoroutine(Vector3 bombPosition, NetworkObject bombInstance)
         {
             yield return new WaitForSeconds(0.5f);
 
@@ -36,6 +36,8 @@ namespace Game.Server
             yield return new WaitForSeconds(2f);
 
             Runner.Despawn(bombInstance);
+
+            // Invoke RestoreBombCount to the user's inventory
         }
 
         private void HitAndDestroyCrate(Vector3 origin, Vector3 direction)

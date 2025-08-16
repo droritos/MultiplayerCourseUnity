@@ -35,8 +35,8 @@ public class BombVfx : VfxController
         TestPlay();
     }
 #endif
-    [ContextMenu("Test Play (5s)")]
-    private void TestPlay() => Play(5f);
+    [ContextMenu("Test Play (3s)")]
+    private void TestPlay() => Play(3f);
 
     /// <summary>
     /// Generates explosion effects at the given world positions.
@@ -106,7 +106,6 @@ public class BombVfx : VfxController
         sequence.AppendCallback(() =>
         {
             StopFuseEffect();
-            //PlayEffectOnce(prePopPuff);
         });
 
 
@@ -132,6 +131,7 @@ public class BombVfx : VfxController
     protected override void OnComplete()
     {
         List<Vector3> explodePositions = _explodePositions.Select(t => t.position).ToList();
+        explodePositions.Add(this.transform.position); // Adding the bomb's position to the explosion positions - Total of 5 positions
 
         PlayExplosionEffects(explodePositions); // Temporary, for testing Until gifure out how to pass positions of Blocks\Tiles
         base.OnComplete();
